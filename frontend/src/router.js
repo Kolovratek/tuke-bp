@@ -4,7 +4,6 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Container } from 'reactstrap';
 
 import { Uploader } from './components/Uploader';
-import { Downloader } from './components/Downloader';
 import { DataVisualization } from './components/DataVisualization';
 import { Datasets } from './components/Datasets';
 import { Dataset } from './components/Dataset';
@@ -35,14 +34,6 @@ export const router = createBrowserRouter([
         element: (
           <Container>
             <Dataset />
-          </Container>
-        )
-      },
-      {
-        path: '/download',
-        element: (
-          <Container>
-            <Downloader />
           </Container>
         )
       },

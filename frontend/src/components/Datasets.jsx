@@ -14,6 +14,13 @@ export function Datasets() {
     request();
   }, []);
 
+  const handleDeleteDataset = async (datasetId) => {
+    const res = await APIDatabase.delete_dataset(datasetId);
+    if (res.status === 'success') {
+      setDatasets(datasets.filter((id) => id !== datasetId));
+    }
+  };
+
   return (
     <div>
       <Table>Datasets</Table>
@@ -21,6 +28,9 @@ export function Datasets() {
         {datasets.map((datasetId) => (
           <tr key={datasetId}>
             <td>{datasetId}</td>
+            <td>
+              <input type="checkbox" onClick={() => handleDeleteDataset(datasetId)} />
+            </td>
             <td>
               <Link to={`/dataset/${datasetId}`}>Dataset {datasetId}</Link>
             </td>

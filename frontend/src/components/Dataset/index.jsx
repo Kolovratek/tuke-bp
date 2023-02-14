@@ -7,8 +7,9 @@ import { APIDatabase } from '../../API';
 
 export function Dataset() {
   let { id } = useParams();
-  const [, setDropColumns] = React.useState([]);
-  const [, setOneHotColumns] = React.useState([]);
+  const [dropColumns, setDropColumns] = useState([]);
+  const [oneHotColumns, setOneHotColumns] = useState([]);
+  const [imputationColumns, setImputationColumns] = useState([]);
   const [dataset, setDataset] = useState(null);
 
   useEffect(() => {
@@ -19,9 +20,53 @@ export function Dataset() {
     request();
   }, []);
 
-  const handleSaveChanges = async () => {};
+  const handleDrop = async () => {
+    if (dropColumns.length === 0) {
+      return;
+    }
+    const value = dropColumns;
+    const data = await APIDatabase.drop(value, id);
+    let data2 = {
+      data,
+      id
+    };
+    setDataset(data2);
+  };
 
-  const handleOneHotEncoding = async () => {};
+  const handleOneHotEncoding = async () => {
+    if (oneHotColumns.length !== 1) {
+      return;
+    }
+    const value = oneHotColumns[0];
+    const data = await APIDatabase.oneHotEncoding(value, id);
+    let data2 = {
+      data,
+      id
+    };
+    setDataset(data2);
+  };
+
+  const handleImputation = async () => {
+    if (imputationColumns.length === 0) {
+      return;
+    }
+    const value = imputationColumns[0];
+    const data = await APIDatabase.Imputation(value, id);
+
+    setDataset(data);
+  };
+
+  const handleDownloadCsv = async () => {
+    APIDatabase.download('csv', id);
+  };
+
+  const handleDownloadJson = async () => {
+    APIDatabase.download('json', id);
+  };
+
+  const handleDownloadXlsx = async () => {
+    APIDatabase.download('xlsx', id);
+  };
 
   return (
     <div>
@@ -31,10 +76,15 @@ export function Dataset() {
           <MyTable
             data={dataset.data}
             setDropColumns={setDropColumns}
+            setImputationColums={setImputationColumns}
             setOneHotColumns={setOneHotColumns}
           />
-          <Button onClick={handleSaveChanges}>Save Changes</Button>
+          <Button onClick={handleDrop}>Drop</Button>
+          <Button onClick={handleImputation}>Imputation</Button>
           <Button onClick={handleOneHotEncoding}>One Hot Encoding</Button>
+          <Button onClick={handleDownloadCsv}>CSV</Button>
+          <Button onClick={handleDownloadJson}>JSON</Button>
+          <Button onClick={handleDownloadXlsx}>XLSX</Button>
         </div>
       )}
     </div>

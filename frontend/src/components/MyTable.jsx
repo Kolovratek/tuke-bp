@@ -2,14 +2,15 @@ import React, { useMemo } from 'react';
 import { Label, Input, Table } from 'reactstrap';
 
 // eslint-disable-next-line react/prop-types
-export function MyTable({ data, setDropColumns, setOneHotColumns }) {
+export function MyTable({ data, setDropColumns, setOneHotColumns, setImputationColums }) {
   const { header, rows } = useMemo(() => {
     const header = data[0];
-    const rows = Array.from(data).slice(1);
+    const rows = Array.from(data).slice(0);
     return { header, rows };
   }, [data]);
 
-  const headerRender = header.map((value, index) => (
+  let headerArray = Object.values(header);
+  const headerRender = headerArray.map((value, index) => (
     <th key={index}>
       <div className="flex flex-column">
         <div>{value}</div>
@@ -31,6 +32,19 @@ export function MyTable({ data, setDropColumns, setOneHotColumns }) {
             <Input
               type="checkbox"
               onChange={(e) => {
+                setImputationColums((state) =>
+                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
+                );
+              }}
+            />{' '}
+            Inputation
+          </Label>
+        </div>
+        <div>
+          <Label check>
+            <Input
+              type="checkbox"
+              onChange={(e) => {
                 setOneHotColumns((state) =>
                   e.target.checked ? [...state, index] : state.filter((c) => c !== index)
                 );
@@ -43,7 +57,9 @@ export function MyTable({ data, setDropColumns, setOneHotColumns }) {
     </th>
   ));
 
-  const rowsRender = rows.map((row, index) => (
+  let rowsArray = Object.values(rows);
+  let rowsArray2 = rowsArray.map((row) => Object.values(row));
+  const rowsRender = rowsArray2.map((row, index) => (
     <tr key={index}>
       {row.map((value, index) => (
         <td key={index}>{value}</td>

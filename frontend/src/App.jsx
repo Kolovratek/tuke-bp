@@ -20,11 +20,6 @@ function Menu() {
         className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}>
         Data-Visualization
       </NavLink>{' '}
-      <NavLink
-        to={`/download`}
-        className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}>
-        Download
-      </NavLink>{' '}
     </div>
   );
 }
