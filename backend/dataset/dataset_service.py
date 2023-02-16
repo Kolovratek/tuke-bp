@@ -1,8 +1,9 @@
 from django.http import HttpResponse, HttpResponseBadRequest
 from dataset.models import Dataset
 from dataset.helpers import parse_file_to_DataFrame
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
+import numpy as np
 
 class DatasetService:
     @staticmethod
@@ -32,34 +33,8 @@ class DatasetService:
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
 
-    #TODO:
-    @staticmethod
-    def imputation_columns(dataset_id: int):
-        try:
-            dataset = Dataset.objects.get(id=dataset_id)
-            df = pd.DataFrame(dataset.data)
-            #TODO: Imputation
-            res = df.to_json(orient='records')
-            data = df.to_dict('records')
-            dataset.data = data
-            dataset.save()
-            return res
-        except Dataset.DoesNotExist:
-            return { "status": "error", "message": "Dataset not found" }
-
-    #TODO:
-    @staticmethod
-    def visualize_Dataset(dataset_id: int):
-        try:
-            dataset = Dataset.objects.get(id=dataset_id)
-            return { "status": "success" }
-        except Dataset.DoesNotExist:
-            return { "status": "error", "message": "Dataset not found" }
-
-    #TODO:
     @staticmethod
     def drop_columns(dataset_id: int, columnsToRemove):
-        print('SERVICE',columnsToRemove)
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
@@ -91,6 +66,51 @@ class DatasetService:
             dataset.data = data
             dataset.save()
             return res
+        except Dataset.DoesNotExist:
+            return { "status": "error", "message": "Dataset not found" }
+
+    @staticmethod
+    def normalize_columns(dataset_id: int, columns_normalize):
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            df = pd.DataFrame(dataset.data)
+            column_name = df.columns[columns_normalize]
+            df[column_name] = MinMaxScaler().fit_transform(np.array(df[column_name]).reshape(-1,1))
+            res = df.to_json(orient='records')
+            data = df.to_dict('records')
+            dataset.data = data
+            dataset.save()
+            return res
+        except Dataset.DoesNotExist:
+            return { "status": "error", "message": "Dataset not found" }
+        
+    #TODO:
+    @staticmethod
+    def imputation_columns(dataset_id: int, columns_imputation, type_of_imputation):
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            df = pd.DataFrame(dataset.data)
+            column_name = df.columns[columns_imputation]
+            if type_of_imputation == '0':
+                df[column_name] = df[column_name].fillna(0)
+            elif type_of_imputation == 'mean':
+                df[column_name] = df[column_name].fillna(df[column_name].mean())
+            elif type_of_imputation == 'median':
+                df[column_name] = df[column_name].fillna(df[column_name].median())
+            res = df.to_json(orient='records')
+            data = df.to_dict('records')
+            dataset.data = data
+            dataset.save()
+            return res
+        except Dataset.DoesNotExist:
+            return { "status": "error", "message": "Dataset not found" }
+
+    #TODO:
+    @staticmethod
+    def visualize_Dataset(dataset_id: int):
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            return { "status": "success" }
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
 

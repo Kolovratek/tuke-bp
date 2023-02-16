@@ -9,6 +9,7 @@ export function Dataset() {
   let { id } = useParams();
   const [dropColumns, setDropColumns] = useState([]);
   const [oneHotColumns, setOneHotColumns] = useState([]);
+  const [normalizeColumns, setNormalizeColumns] = useState([]);
   const [imputationColumns, setImputationColumns] = useState([]);
   const [dataset, setDataset] = useState(null);
 
@@ -46,14 +47,56 @@ export function Dataset() {
     setDataset(data2);
   };
 
-  const handleImputation = async () => {
-    if (imputationColumns.length === 0) {
+  const handleNormalize = async () => {
+    if (normalizeColumns.length !== 1) {
+      return;
+    }
+    const value = normalizeColumns[0];
+    const data = await APIDatabase.normalize(value, id);
+    let data2 = {
+      data,
+      id
+    };
+    setDataset(data2);
+  };
+
+  const handleImputationZero = async () => {
+    if (imputationColumns.length !== 1) {
       return;
     }
     const value = imputationColumns[0];
-    const data = await APIDatabase.Imputation(value, id);
+    const data = await APIDatabase.Imputation(value, '0', id);
+    let data2 = {
+      data,
+      id
+    };
+    setDataset(data2);
+  };
 
-    setDataset(data);
+  const handleImputationMean = async () => {
+    if (imputationColumns.length !== 1) {
+      return;
+    }
+    const value = imputationColumns[0];
+    const data = await APIDatabase.Imputation(value, 'mean', id);
+    let data2 = {
+      data,
+      id
+    };
+    setDataset(data2);
+  };
+
+  const handleImputationMedian = async () => {
+    if (imputationColumns.length !== 1) {
+      return;
+    }
+    const value = imputationColumns[0];
+    const data = await APIDatabase.Imputation(value, 'median', id);
+    let data2 = {
+      data,
+      id
+    };
+    setDataset(data2);
   };
 
   const handleDownloadCsv = async () => {
@@ -76,12 +119,16 @@ export function Dataset() {
           <MyTable
             data={dataset.data}
             setDropColumns={setDropColumns}
-            setImputationColums={setImputationColumns}
             setOneHotColumns={setOneHotColumns}
+            setNormalizeColumns={setNormalizeColumns}
+            setImputationColums={setImputationColumns}
           />
           <Button onClick={handleDrop}>Drop</Button>
-          <Button onClick={handleImputation}>Imputation</Button>
+          <Button onClick={handleImputationZero}>Imp. 0</Button>
+          <Button onClick={handleImputationMean}>Imp. Mean</Button>
+          <Button onClick={handleImputationMedian}>Imp. Median</Button>
           <Button onClick={handleOneHotEncoding}>One Hot Encoding</Button>
+          <Button onClick={handleNormalize}>Normalize</Button>
           <Button onClick={handleDownloadCsv}>CSV</Button>
           <Button onClick={handleDownloadJson}>JSON</Button>
           <Button onClick={handleDownloadXlsx}>XLSX</Button>

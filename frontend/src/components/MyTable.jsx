@@ -1,8 +1,14 @@
 import React, { useMemo } from 'react';
 import { Label, Input, Table } from 'reactstrap';
 
-// eslint-disable-next-line react/prop-types
-export function MyTable({ data, setDropColumns, setOneHotColumns, setImputationColums }) {
+/* eslint react/prop-types: 0 */
+export function MyTable({
+  data,
+  setDropColumns,
+  setOneHotColumns,
+  setImputationColums,
+  setNormalizeColumns
+}) {
   const { header, rows } = useMemo(() => {
     const header = data[0];
     const rows = Array.from(data).slice(0);
@@ -51,6 +57,19 @@ export function MyTable({ data, setDropColumns, setOneHotColumns, setImputationC
               }}
             />{' '}
             One Hot
+          </Label>
+        </div>
+        <div>
+          <Label check>
+            <Input
+              type="checkbox"
+              onChange={(e) => {
+                setNormalizeColumns((state) =>
+                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
+                );
+              }}
+            />{' '}
+            Normalize
           </Label>
         </div>
       </div>
