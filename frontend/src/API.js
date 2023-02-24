@@ -43,16 +43,37 @@ export class APIDatabase {
   }
 
   static async normalize(normalizeColumns, id) {
-    const res = await fetch(`${URL}/dataset/normalize/${id}`, {
-      method: 'POST',
-      headers: COMMON_HEADERS,
-      body: JSON.stringify({
-        columns: normalizeColumns,
-        id: id
-      })
-    });
-    const body = await res.json();
-    return body;
+    try {
+      const res = await fetch(`${URL}/dataset/normalize/${id}`, {
+        method: 'POST',
+        headers: COMMON_HEADERS,
+        body: JSON.stringify({
+          columns: normalizeColumns,
+          id: id
+        })
+      });
+      const body = await res.json();
+      return body;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  static async visualize(visualizeColumns, id) {
+    try {
+      const res = await fetch(`${URL}/dataset/visualize_data/${id}`, {
+        method: 'POST',
+        headers: COMMON_HEADERS,
+        body: JSON.stringify({
+          columns: visualizeColumns,
+          id: id
+        })
+      });
+      const body = await res.json();
+      return body;
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   static async Imputation(ImputationColumns, ImputationType, id) {

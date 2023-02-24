@@ -2,8 +2,10 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from dataset.models import Dataset
 from dataset.helpers import parse_file_to_DataFrame
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.manifold import TSNE
 import pandas as pd
 import numpy as np
+import json
 
 class DatasetService:
     @staticmethod
@@ -20,7 +22,7 @@ class DatasetService:
     def upload(file) -> Dataset:
         print("Received new data")
         data = parse_file_to_DataFrame(file).values.tolist()
-        dataset = Dataset.objects.create( data=data)
+        dataset = Dataset.objects.create(data=data)
         dataset.save()
         return dataset
 
@@ -37,6 +39,7 @@ class DatasetService:
     def drop_columns(dataset_id: int, columnsToRemove):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
+            
             df = pd.DataFrame(dataset.data)
             df = df.drop(df.columns[columnsToRemove], axis=1)
             res = df.to_json(orient='records')
@@ -84,7 +87,7 @@ class DatasetService:
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
         
-    #TODO:
+    
     @staticmethod
     def imputation_columns(dataset_id: int, columns_imputation, type_of_imputation):
         try:
@@ -107,10 +110,18 @@ class DatasetService:
 
     #TODO:
     @staticmethod
-    def visualize_Dataset(dataset_id: int):
+    def visualize_Dataset(dataset_id: int, columns_visualize):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
-            return { "status": "success" }
+            df = pd.DataFrame(dataset.data)
+            column_name = df.columns[columns_visualize].tolist()
+            X = df[column_name]
+            tsne = TSNE(n_components=2, random_state=42)
+            X_tsne = tsne.fit_transform(X)
+            df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE_1', 't-SNE_2'])
+            df_tsne['kategoria'] = df['kategoria']
+            res = json.loads(df_tsne.to_json(orient='records'))
+            return res
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
 

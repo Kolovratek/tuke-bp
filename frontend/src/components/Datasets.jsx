@@ -32,7 +32,7 @@ export function Datasets() {
               <input type="checkbox" onClick={() => handleDeleteDataset(datasetId)} />
             </td>
             <td>
-              <Link to={`/dataset/${datasetId}`}>Dataset {datasetId}</Link>
+              <Link to={`/dataset/${datasetId}`}>Dataset Name</Link>
             </td>
           </tr>
         ))}

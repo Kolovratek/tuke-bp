@@ -2,7 +2,6 @@ from django.http import JsonResponse, HttpRequest, HttpResponseBadRequest
 from django.core.exceptions import BadRequest
 from django.views.decorators.csrf import csrf_exempt
 from dataset.dataset_service import DatasetService
-from django.http import HttpResponse
 import json
 
 @csrf_exempt
@@ -88,6 +87,8 @@ def imputationDatasetRoute(request: HttpRequest, dataset_id: int):
 @csrf_exempt
 def visualizeDatasetRoute(request: HttpRequest, dataset_id: int):
     if (request.method == "POST"):
-        res = DatasetService.visualize_Dataset(dataset_id)
-        return JsonResponse(res)
+        json_data = json.loads(request.body)
+        columns_visualize = json_data['columns']
+        res = DatasetService.visualize_Dataset(dataset_id, columns_visualize)
+        return JsonResponse(json.loads(res), safe=False)
     raise BadRequest("invalid method")

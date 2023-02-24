@@ -8,9 +8,10 @@ export function MyTable({
   setOneHotColumns,
   setImputationColums,
   setNormalizeColumns
+  //setVisualizeColumns
 }) {
   const { header, rows } = useMemo(() => {
-    const header = data[0];
+    const header = Object.keys(data[0]);
     const rows = Array.from(data).slice(0);
     return { header, rows };
   }, [data]);
@@ -29,8 +30,8 @@ export function MyTable({
                   e.target.checked ? [...state, index] : state.filter((c) => c !== index)
                 );
               }}
-            />{' '}
-            Drop
+            />
+            <span>Drop</span>
           </Label>
         </div>
         <div>
@@ -42,8 +43,8 @@ export function MyTable({
                   e.target.checked ? [...state, index] : state.filter((c) => c !== index)
                 );
               }}
-            />{' '}
-            Inputation
+            />
+            <span>Imputation</span>
           </Label>
         </div>
         <div>
@@ -55,8 +56,8 @@ export function MyTable({
                   e.target.checked ? [...state, index] : state.filter((c) => c !== index)
                 );
               }}
-            />{' '}
-            One Hot
+            />
+            <span>One Hot</span>
           </Label>
         </div>
         <div>
@@ -68,10 +69,23 @@ export function MyTable({
                   e.target.checked ? [...state, index] : state.filter((c) => c !== index)
                 );
               }}
-            />{' '}
-            Normalize
+            />
+            <span>Normalize</span>
           </Label>
         </div>
+        {/* <div>
+          <Label check>
+            <Input
+              type="checkbox"
+              onChange={(e) => {
+                setVisualizeColumns((state) =>
+                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
+                );
+              }}
+            />
+            Visualize
+          </Label>
+        </div> */}
       </div>
     </th>
   ));

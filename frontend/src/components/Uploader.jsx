@@ -3,6 +3,7 @@ import { Form, FormGroup, Label, Input, Card, Button, Row, Col } from 'reactstra
 
 export function Uploader() {
   const [file, setFile] = React.useState(null);
+  const [, setFileName] = React.useState('');
   const [error, setError] = React.useState('');
 
   const onSubmit = async (event) => {
@@ -12,12 +13,12 @@ export function Uploader() {
       setError('Please select a file to upload.');
       return;
     }
-    if (!['csv', 'txt', 'xlsx', 'arff'].includes(file.name.split('.')[1])) {
-      setError('Invalid file type. Please select a CSV, TXT, XLSX or ARFF file.');
+    if (!['csv', 'txt', 'xlsx'].includes(file.name.split('.')[1])) {
+      setError('Invalid file type. Please select a CSV, TXT or XLSX file.');
       return;
     }
-    if (file.size > 10000000) {
-      setError('File size too large. Please select a file under 10MB.');
+    if (file.size > 100000000) {
+      setError('File size too large. Please select a file under 100MB.');
       return;
     }
     setError('');
@@ -43,6 +44,7 @@ export function Uploader() {
                 onChange={(event) => {
                   const file = event.target.files[0];
                   setFile(file);
+                  setFileName(file.name);
                 }}
               />
               {error && <p className="text-danger">{error}</p>}
