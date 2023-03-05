@@ -39,7 +39,6 @@ class DatasetService:
     def drop_columns(dataset_id: int, columnsToRemove):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
-            
             df = pd.DataFrame(dataset.data)
             df = df.drop(df.columns[columnsToRemove], axis=1)
             res = df.to_json(orient='records')

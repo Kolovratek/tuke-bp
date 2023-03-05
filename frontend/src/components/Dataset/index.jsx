@@ -122,7 +122,6 @@ export function Dataset() {
       const response = await APIDatabase.visualize(value, id);
       setVisualization(response);
       setVisualize(true);
-      console.log(visualize);
     } catch (error) {
       setError(true);
     }
