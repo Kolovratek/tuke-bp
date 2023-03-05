@@ -7,18 +7,15 @@ function Menu() {
     <div className="Navbar">
       <NavLink
         to={`/`}
-        className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}>
+        className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}
+      >
         Uploader
       </NavLink>{' '}
       <NavLink
         to={`/datasets`}
-        className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}>
+        className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}
+      >
         Datasets
-      </NavLink>{' '}
-      <NavLink
-        to={`/visualization`}
-        className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}>
-        Data-Visualization
       </NavLink>{' '}
     </div>
   );

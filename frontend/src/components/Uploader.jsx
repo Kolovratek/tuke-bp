@@ -3,7 +3,7 @@ import { Form, FormGroup, Label, Input, Card, Button, Row, Col } from 'reactstra
 
 export function Uploader() {
   const [file, setFile] = React.useState(null);
-  const [, setFileName] = React.useState('');
+  const [fileName, setFileName] = React.useState('');
   const [error, setError] = React.useState('');
 
   const onSubmit = async (event) => {
@@ -23,8 +23,8 @@ export function Uploader() {
     }
     setError('');
 
-    let formData = new FormData();
-    formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file, fileName);
     await fetch(`http://localhost:8000/dataset/`, {
       method: 'POST',
       body: formData

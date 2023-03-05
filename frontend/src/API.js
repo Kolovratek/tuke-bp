@@ -23,7 +23,7 @@ export class APIDatabase {
     const res = await fetch(`${URL}/dataset/drop/${id}`, {
       method: 'POST',
       headers: COMMON_HEADERS,
-      body: JSON.stringify({ columnsToRemove: dropColumns, id: id })
+      body: JSON.stringify({ columnsToRemove: dropColumns, id })
     });
     const body = await res.json();
     return body;
@@ -35,7 +35,7 @@ export class APIDatabase {
       headers: COMMON_HEADERS,
       body: JSON.stringify({
         columns: oneHotColumns,
-        id: id
+        id
       })
     });
     const body = await res.json();
@@ -49,7 +49,7 @@ export class APIDatabase {
         headers: COMMON_HEADERS,
         body: JSON.stringify({
           columns: normalizeColumns,
-          id: id
+          id
         })
       });
       const body = await res.json();
@@ -66,7 +66,7 @@ export class APIDatabase {
         headers: COMMON_HEADERS,
         body: JSON.stringify({
           columns: visualizeColumns,
-          id: id
+          id
         })
       });
       const body = await res.json();
@@ -83,7 +83,7 @@ export class APIDatabase {
       body: JSON.stringify({
         columns: ImputationColumns,
         type: ImputationType,
-        id: id
+        id
       })
     });
     const body = await res.json();
@@ -97,7 +97,7 @@ export class APIDatabase {
         headers: COMMON_HEADERS,
         body: JSON.stringify({
           file_type: fileType,
-          id: id
+          id
         })
       });
       if (!res.ok) {
@@ -118,7 +118,7 @@ export class APIDatabase {
   static async delete_dataset(id) {
     const res = await fetch(`${URL}/dataset/delete/${id}`, {
       method: 'DELETE',
-      body: JSON.stringify({ id: id })
+      body: JSON.stringify({ id })
     });
     const json = await res.json();
     return json;

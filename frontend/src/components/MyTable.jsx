@@ -6,9 +6,9 @@ export function MyTable({
   data,
   setDropColumns,
   setOneHotColumns,
-  setImputationColums,
-  setNormalizeColumns
-  //setVisualizeColumns
+  setImputationColumns,
+  setNormalizeColumns,
+  setVisualizeColumns
 }) {
   const { header, rows } = useMemo(() => {
     const header = Object.keys(data[0]);
@@ -16,10 +16,10 @@ export function MyTable({
     return { header, rows };
   }, [data]);
 
-  let headerArray = Object.values(header);
+  const headerArray = Object.values(header);
   const headerRender = headerArray.map((value, index) => (
     <th key={index}>
-      <div className="flex flex-column">
+      <div className="">
         <div>{value}</div>
         <div>
           <Label check>
@@ -39,7 +39,7 @@ export function MyTable({
             <Input
               type="checkbox"
               onChange={(e) => {
-                setImputationColums((state) =>
+                setImputationColumns((state) =>
                   e.target.checked ? [...state, index] : state.filter((c) => c !== index)
                 );
               }}
@@ -73,7 +73,7 @@ export function MyTable({
             <span>Normalize</span>
           </Label>
         </div>
-        {/* <div>
+        <div>
           <Label check>
             <Input
               type="checkbox"
@@ -85,13 +85,13 @@ export function MyTable({
             />
             Visualize
           </Label>
-        </div> */}
+        </div>
       </div>
     </th>
   ));
 
-  let rowsArray = Object.values(rows);
-  let rowsArray2 = rowsArray.map((row) => Object.values(row));
+  const rowsArray = Object.values(rows);
+  const rowsArray2 = rowsArray.map((row) => Object.values(row));
   const rowsRender = rowsArray2.map((row, index) => (
     <tr key={index}>
       {row.map((value, index) => (

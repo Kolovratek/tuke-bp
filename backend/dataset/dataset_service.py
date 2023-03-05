@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
 from dataset.models import Dataset
 from dataset.helpers import parse_file_to_DataFrame
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
@@ -63,7 +63,6 @@ class DatasetService:
             encoder_df = pd.DataFrame(encoder.fit_transform(df[[column_name]]).toarray(), columns=categories)
             df = df.drop(df.columns[columns_ohe], axis=1)
             final_df = pd.concat([df, encoder_df], axis=1)
-            print(final_df)
             res = final_df.to_json(orient='records')
             data = final_df.to_dict('records')
             dataset.data = data
@@ -108,18 +107,17 @@ class DatasetService:
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
 
-    #TODO:
     @staticmethod
     def visualize_Dataset(dataset_id: int, columns_visualize):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
             column_name = df.columns[columns_visualize].tolist()
-            X = df[column_name]
-            tsne = TSNE(n_components=2, random_state=42)
+            X = df.loc[:, column_name]
+            tsne = TSNE(n_components=2, random_state=42, init='random', perplexity=2)
             X_tsne = tsne.fit_transform(X)
             df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE_1', 't-SNE_2'])
-            df_tsne['kategoria'] = df['kategoria']
+            df_tsne[column_name] = df[column_name]
             res = json.loads(df_tsne.to_json(orient='records'))
             return res
         except Dataset.DoesNotExist:

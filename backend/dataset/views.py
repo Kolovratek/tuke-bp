@@ -13,8 +13,10 @@ def handleDatasetRoot(request: HttpRequest):
         })
 
     if (request.method == "POST"):
+        #filename = request.body['filename']
         file = request.FILES['file']
         dataset = DatasetService.upload(file)
+        
         return JsonResponse({ "id": dataset.id })
 
     raise BadRequest("invalid method")
@@ -90,5 +92,5 @@ def visualizeDatasetRoute(request: HttpRequest, dataset_id: int):
         json_data = json.loads(request.body)
         columns_visualize = json_data['columns']
         res = DatasetService.visualize_Dataset(dataset_id, columns_visualize)
-        return JsonResponse(json.loads(res), safe=False)
+        return JsonResponse(res, safe=False)
     raise BadRequest("invalid method")

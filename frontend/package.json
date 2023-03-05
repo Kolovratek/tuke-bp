@@ -7,8 +7,10 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.2.3",
+    "plotly.js": "^2.18.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.4.3",
     "react-scripts": "5.0.1",
     "reactstrap": "^9.1.4",
@@ -19,9 +21,12 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix",
-    "prettier:fix": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+    "eslint": "eslint .",
+    "eslint:fix": "eslint --fix",
+    "prettier": "prettier --check './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+    "prettier:fix": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc",
+    "lint": "npm run eslint && npm run prettier",
+    "lint:fix": "npm run eslint:fix && npm run prettier:fix"
   },
   "eslintConfig": {
     "extends": [
@@ -42,12 +47,17 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^8.33.0",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-semistandard": "^17.0.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.32.2",
-    "prettier": "^2.8.3"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "2.8.4"
   }
 }
