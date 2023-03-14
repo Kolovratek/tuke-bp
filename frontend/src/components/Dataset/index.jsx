@@ -11,13 +11,15 @@ export function Dataset() {
   const { id } = useParams();
   const [dropColumns, setDropColumns] = useState([]);
   const [oneHotColumns, setOneHotColumns] = useState([]);
-  const [visualizeColumns, setVisualizeColumns] = useState([]);
-  const [normalizeColumns, setNormalizeColumns] = useState([]);
-  const [imputationColumns, setImputationColumns] = useState([]);
   const [dataset, setDataset] = useState(null);
   const [error, setError] = useState(false);
   const [visualize, setVisualize] = useState(false);
   const [visualization, setVisualization] = useState(null);
+  const [visualizeButton, setVisualizeButton] = useState(false);
+  const [normalizeButton, setNormalizeButton] = useState(false);
+  const [imputationZeroButton, setImputationZeroButton] = useState(false);
+  const [imputationMedianButton, setImputationMedianButton] = useState(false);
+  const [imputationMeanButton, setImputationMeanButton] = useState(false);
 
   useEffect(() => {
     const request = async () => {
@@ -57,71 +59,63 @@ export function Dataset() {
   };
 
   const handleNormalize = async () => {
-    if (normalizeColumns.length !== 1) {
-      return;
-    }
-    await handleRequest(id, () => APIDatabase.normalize(normalizeColumns[0], id));
-  };
-
-  const handleImputationZero = async () => {
-    if (imputationColumns.length !== 1) {
-      return;
-    }
-
-    const value = imputationColumns[0];
     try {
-      const data = await APIDatabase.Imputation(value, '0', id);
+      const data = await APIDatabase.normalize(id);
       setDataset({
         data,
         id
       });
+      setNormalizeButton(true);
+    } catch (error) {
+      setError(true);
+    }
+  };
+
+  const handleImputationZero = async () => {
+    try {
+      const data = await APIDatabase.Imputation('0', id);
+      setDataset({
+        data,
+        id
+      });
+      setImputationZeroButton(true);
     } catch (error) {
       setError(true);
     }
   };
 
   const handleImputationMean = async () => {
-    if (imputationColumns.length !== 1) {
-      return;
-    }
-    const value = imputationColumns[0];
     try {
-      const data = await APIDatabase.Imputation(value, 'mean', id);
+      const data = await APIDatabase.Imputation('mean', id);
       setDataset({
         data,
         id
       });
+      setImputationMeanButton(true);
     } catch (error) {
       setError(true);
     }
   };
 
   const handleImputationMedian = async () => {
-    if (imputationColumns.length !== 1) {
-      return;
-    }
-    const value = imputationColumns[0];
     try {
-      const data = await APIDatabase.Imputation(value, 'median', id);
+      const data = await APIDatabase.Imputation('median', id);
       setDataset({
         data,
         id
       });
+      setImputationMedianButton(true);
     } catch (error) {
       setError(true);
     }
   };
 
   const handleVisualize = async () => {
-    if (visualizeColumns.length < 2) {
-      return;
-    }
-    const value = visualizeColumns;
-
     try {
-      const response = await APIDatabase.visualize(value, id);
+      const response = await APIDatabase.visualize(id);
       setVisualization(response);
       setVisualize(true);
+      setVisualizeButton(true);
     } catch (error) {
       setError(true);
     }
@@ -143,12 +137,38 @@ export function Dataset() {
         <div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
             <Button onClick={handleDrop}>Drop</Button>
-            <Button onClick={handleImputationZero}>Imp. 0</Button>
-            <Button onClick={handleImputationMean}>Imp. Mean</Button>
-            <Button onClick={handleImputationMedian}>Imp. Median</Button>
             <Button onClick={handleOneHotEncoding}>One Hot Encoding</Button>
-            <Button onClick={handleVisualize}>Visualize</Button>
-            <Button onClick={handleNormalize}>Normalize</Button>
+            <Button
+              style={{ backgroundColor: imputationZeroButton ? 'green' : 'secondary' }}
+              onClick={handleImputationZero}
+            >
+              Imp. 0
+            </Button>
+            <Button
+              style={{ backgroundColor: imputationMeanButton ? 'green' : 'secondary' }}
+              onClick={handleImputationMean}
+            >
+              Imp. Mean
+            </Button>
+            <Button
+              style={{ backgroundColor: imputationMedianButton ? 'green' : 'secondary' }}
+              onClick={handleImputationMedian}
+            >
+              Imp. Median
+            </Button>
+
+            <Button
+              style={{ backgroundColor: visualizeButton ? 'green' : 'secondary' }}
+              onClick={handleVisualize}
+            >
+              Visualize
+            </Button>
+            <Button
+              style={{ backgroundColor: normalizeButton ? 'green' : 'secondary' }}
+              onClick={handleNormalize}
+            >
+              Normalize
+            </Button>
             <Button onClick={factoryHandleDownload('csv')}>CSV</Button>
             <Button onClick={factoryHandleDownload('json')}>JSON</Button>
             <Button onClick={factoryHandleDownload('xlsx')}>XLSX</Button>
@@ -157,9 +177,6 @@ export function Dataset() {
             data={dataset.data}
             setDropColumns={setDropColumns}
             setOneHotColumns={setOneHotColumns}
-            setNormalizeColumns={setNormalizeColumns}
-            setImputationColumns={setImputationColumns}
-            setVisualizeColumns={setVisualizeColumns}
           />
         </div>
       )}

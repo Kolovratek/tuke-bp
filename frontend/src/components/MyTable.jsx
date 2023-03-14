@@ -2,14 +2,7 @@ import React, { useMemo } from 'react';
 import { Label, Input, Table } from 'reactstrap';
 
 /* eslint react/prop-types: 0 */
-export function MyTable({
-  data,
-  setDropColumns,
-  setOneHotColumns,
-  setImputationColumns,
-  setNormalizeColumns,
-  setVisualizeColumns
-}) {
+export function MyTable({ data, setDropColumns, setOneHotColumns }) {
   const { header, rows } = useMemo(() => {
     const header = Object.keys(data[0]);
     const rows = Array.from(data).slice(0);
@@ -39,51 +32,12 @@ export function MyTable({
             <Input
               type="checkbox"
               onChange={(e) => {
-                setImputationColumns((state) =>
-                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
-                );
-              }}
-            />
-            <span>Imputation</span>
-          </Label>
-        </div>
-        <div>
-          <Label check>
-            <Input
-              type="checkbox"
-              onChange={(e) => {
                 setOneHotColumns((state) =>
                   e.target.checked ? [...state, index] : state.filter((c) => c !== index)
                 );
               }}
             />
             <span>One Hot</span>
-          </Label>
-        </div>
-        <div>
-          <Label check>
-            <Input
-              type="checkbox"
-              onChange={(e) => {
-                setNormalizeColumns((state) =>
-                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
-                );
-              }}
-            />
-            <span>Normalize</span>
-          </Label>
-        </div>
-        <div>
-          <Label check>
-            <Input
-              type="checkbox"
-              onChange={(e) => {
-                setVisualizeColumns((state) =>
-                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
-                );
-              }}
-            />
-            Visualize
           </Label>
         </div>
       </div>

@@ -13,8 +13,8 @@ export function Uploader() {
       setError('Please select a file to upload.');
       return;
     }
-    if (!['csv', 'txt', 'xlsx'].includes(file.name.split('.')[1])) {
-      setError('Invalid file type. Please select a CSV, TXT or XLSX file.');
+    if (!['csv', 'xlsx', 'json'].includes(file.name.split('.')[1])) {
+      setError('Invalid file type. Please select a CSV, JSON or XLSX file.');
       return;
     }
     if (file.size > 100000000) {

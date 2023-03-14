@@ -21,7 +21,8 @@ class DatasetService:
     @staticmethod
     def upload(file) -> Dataset:
         print("Received new data")
-        data = parse_file_to_DataFrame(file).values.tolist()
+        df = parse_file_to_DataFrame(file)
+        data = df.replace({np.nan: None}).to_dict('records')
         dataset = Dataset.objects.create(data=data)
         dataset.save()
         return dataset
@@ -71,12 +72,19 @@ class DatasetService:
             return { "status": "error", "message": "Dataset not found" }
 
     @staticmethod
-    def normalize_columns(dataset_id: int, columns_normalize):
+    def normalize_columns(dataset_id: int):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            column_name = df.columns[columns_normalize]
-            df[column_name] = MinMaxScaler().fit_transform(np.array(df[column_name]).reshape(-1,1))
+            # scaler = MinMaxScaler()
+            # df_normalized = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
+            # STARE
+            # column_name = df.columns[columns_normalize]
+            # df[column_name] = MinMaxScaler().fit_transform(np.array(df[column_name]).reshape(-1,1))
+            scaler = MinMaxScaler()
+            for col_name in df.columns:
+                if df[col_name].dtype == np.float64 or df[col_name].dtype == np.int64:
+                    df[col_name] = scaler.fit_transform(np.array(df[col_name]).reshape(-1, 1))
             res = df.to_json(orient='records')
             data = df.to_dict('records')
             dataset.data = data
@@ -87,17 +95,22 @@ class DatasetService:
         
     
     @staticmethod
-    def imputation_columns(dataset_id: int, columns_imputation, type_of_imputation):
+    def imputation_columns(dataset_id: int, type_of_imputation):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            column_name = df.columns[columns_imputation]
+            # if type_of_imputation == '0':
+            #     df[column_name] = df[column_name].fillna(0)
+            # elif type_of_imputation == 'mean':
+            #     df[column_name] = df[column_name].fillna(df[column_name].mean())
+            # elif type_of_imputation == 'median':
+            #     df[column_name] = df[column_name].fillna(df[column_name].median())
             if type_of_imputation == '0':
-                df[column_name] = df[column_name].fillna(0)
+                df = df.fillna(0)
             elif type_of_imputation == 'mean':
-                df[column_name] = df[column_name].fillna(df[column_name].mean())
+                df = df.fillna(df.mean())
             elif type_of_imputation == 'median':
-                df[column_name] = df[column_name].fillna(df[column_name].median())
+                df = df.fillna(df.median())
             res = df.to_json(orient='records')
             data = df.to_dict('records')
             dataset.data = data
@@ -107,16 +120,16 @@ class DatasetService:
             return { "status": "error", "message": "Dataset not found" }
 
     @staticmethod
-    def visualize_Dataset(dataset_id: int, columns_visualize):
+    def visualize_Dataset(dataset_id: int):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            column_name = df.columns[columns_visualize].tolist()
-            X = df.loc[:, column_name]
+            # column_name = df.columns[columns_visualize].tolist()
+            # X = df.loc[:, column_name]
             tsne = TSNE(n_components=2, random_state=42, init='random', perplexity=2)
-            X_tsne = tsne.fit_transform(X)
+            X_tsne = tsne.fit_transform(df)
             df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE_1', 't-SNE_2'])
-            df_tsne[column_name] = df[column_name]
+            df_tsne[df.columns] = df[df.columns]
             res = json.loads(df_tsne.to_json(orient='records'))
             return res
         except Dataset.DoesNotExist:

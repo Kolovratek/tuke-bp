@@ -42,13 +42,12 @@ export class APIDatabase {
     return body;
   }
 
-  static async normalize(normalizeColumns, id) {
+  static async normalize(id) {
     try {
       const res = await fetch(`${URL}/dataset/normalize/${id}`, {
         method: 'POST',
         headers: COMMON_HEADERS,
         body: JSON.stringify({
-          columns: normalizeColumns,
           id
         })
       });
@@ -59,13 +58,12 @@ export class APIDatabase {
     }
   }
 
-  static async visualize(visualizeColumns, id) {
+  static async visualize(id) {
     try {
       const res = await fetch(`${URL}/dataset/visualize_data/${id}`, {
         method: 'POST',
         headers: COMMON_HEADERS,
         body: JSON.stringify({
-          columns: visualizeColumns,
           id
         })
       });
@@ -76,12 +74,11 @@ export class APIDatabase {
     }
   }
 
-  static async Imputation(ImputationColumns, ImputationType, id) {
+  static async Imputation(ImputationType, id) {
     const res = await fetch(`${URL}/dataset/imputation/${id}`, {
       method: 'POST',
       headers: COMMON_HEADERS,
       body: JSON.stringify({
-        columns: ImputationColumns,
         type: ImputationType,
         id
       })
