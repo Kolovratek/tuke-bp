@@ -65,6 +65,7 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
+            df = df.fillna('')
             columns_ohe = [df.columns.get_loc(columns_ohe)]
             encoder = OneHotEncoder(handle_unknown='ignore')
             print(columns_ohe)
@@ -110,6 +111,7 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
+            df = df.replace("", np.nan)
             # if type_of_imputation == '0':
             #     df[column_name] = df[column_name].fillna(0)
             # elif type_of_imputation == 'mean':
@@ -119,9 +121,9 @@ class DatasetService:
             if type_of_imputation == '0':
                 df = df.fillna(0)
             elif type_of_imputation == 'mean':
-                df = df.fillna(df.mean())
+                df = df.fillna(df.mean(numeric_only=True))
             elif type_of_imputation == 'median':
-                df = df.fillna(df.median())
+                df = df.fillna(df.median(numeric_only=True))
             res = df.to_json(orient='records')
             data = df.to_dict('records')
             dataset.data = data

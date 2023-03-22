@@ -173,7 +173,6 @@ export function Dataset() {
                 </div>
               )}
             </div>
-            {/* <Button onClick={handleDrop}>Drop</Button> */}
             <div className="dropdown-container">
               <button className="main-button" onClick={toggleDropdownOneHot}>
                 One Hot Encoding
@@ -193,7 +192,6 @@ export function Dataset() {
                 </div>
               )}
             </div>
-            {/* <Button onClick={handleOneHotEncoding}>One Hot Encoding</Button> */}
             <div className="dropdown-container">
               <button className="main-button" onClick={toggleDropdownImputation}>
                 Select imputation method
@@ -255,9 +253,6 @@ export function Dataset() {
                 </div>
               )}
             </div>
-            {/* <Button onClick={factoryHandleDownload('csv')}>CSV</Button>
-            <Button onClick={factoryHandleDownload('json')}>JSON</Button>
-            <Button onClick={factoryHandleDownload('xlsx')}>XLSX</Button> */}
           </div>
           <MyTable data={dataset.data} />
         </div>
