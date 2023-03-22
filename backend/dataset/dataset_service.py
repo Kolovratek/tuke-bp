@@ -39,13 +39,22 @@ class DatasetService:
     @staticmethod
     def drop_columns(dataset_id: int, columnsToRemove):
         try:
+            # dataset = Dataset.objects.get(id=dataset_id)
+            # df = pd.DataFrame(dataset.data)
+            # df = df.drop(columnsToRemove, axis=1)
+            # res = df.to_json(orient='records')
+            # data = df.to_dict('records')
+            # dataset.data = data
+            # dataset.save()
+            # return res
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            df = df.drop(df.columns[columnsToRemove], axis=1)
-            res = df.to_json(orient='records')
+            df = df.fillna('')
+            df = df.drop(columnsToRemove, axis=1)
             data = df.to_dict('records')
             dataset.data = data
             dataset.save()
+            res = df.to_json(orient='records')
             return res
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
@@ -56,11 +65,13 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
+            columns_ohe = [df.columns.get_loc(columns_ohe)]
             encoder = OneHotEncoder(handle_unknown='ignore')
-            column_name = df.columns[columns_ohe]
-            encoder.fit(df[[column_name]])
+            print(columns_ohe)
+            columns_to_encode = [columns_ohe] if isinstance(columns_ohe, str) else columns_ohe
+            encoder.fit(df.iloc[:, columns_to_encode])
             categories = encoder.categories_[0]
-            encoder_df = pd.DataFrame(encoder.fit_transform(df[[column_name]]).toarray(), columns=categories)
+            encoder_df = pd.DataFrame(encoder.transform(df.iloc[:, columns_to_encode]).toarray(), columns=categories)
             df = df.drop(df.columns[columns_ohe], axis=1)
             final_df = pd.concat([df, encoder_df], axis=1)
             res = final_df.to_json(orient='records')

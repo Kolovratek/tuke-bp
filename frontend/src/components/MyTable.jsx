@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Label, Input, Table } from 'reactstrap';
+import { Table } from 'reactstrap';
 
 /* eslint react/prop-types: 0 */
-export function MyTable({ data, setDropColumns, setOneHotColumns }) {
+export function MyTable({ data }) {
   const { header, rows } = useMemo(() => {
     const header = Object.keys(data[0]);
     const rows = Array.from(data).slice(0);
@@ -12,34 +12,8 @@ export function MyTable({ data, setDropColumns, setOneHotColumns }) {
   const headerArray = Object.values(header);
   const headerRender = headerArray.map((value, index) => (
     <th key={index}>
-      <div className="">
+      <div>
         <div>{value}</div>
-        <div>
-          <Label check>
-            <Input
-              type="checkbox"
-              onChange={(e) => {
-                setDropColumns((state) =>
-                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
-                );
-              }}
-            />
-            <span>Drop</span>
-          </Label>
-        </div>
-        <div>
-          <Label check>
-            <Input
-              type="checkbox"
-              onChange={(e) => {
-                setOneHotColumns((state) =>
-                  e.target.checked ? [...state, index] : state.filter((c) => c !== index)
-                );
-              }}
-            />
-            <span>One Hot</span>
-          </Label>
-        </div>
       </div>
     </th>
   ));
