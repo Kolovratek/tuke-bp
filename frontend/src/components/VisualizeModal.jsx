@@ -7,7 +7,7 @@ export const VisualizeModal = (props) => {
   return (
     <div className="modal show" style={{ display: 'block', position: 'initial' }}>
       <Modal isOpen={true}>
-        <ModalHeader>TSNE</ModalHeader>
+        <ModalHeader></ModalHeader>
         <Plot
           data={[
             {
@@ -15,7 +15,7 @@ export const VisualizeModal = (props) => {
               y: props.visualization.map((row) => row['t-SNE_2']),
               mode: 'markers',
               marker: {
-                color: props.visualization.map((row) => row.kategoria),
+                color: props.visualization.map((row) => row.id),
                 colorscale: 'Viridis'
               }
             }

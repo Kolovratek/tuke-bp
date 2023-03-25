@@ -67,6 +67,15 @@ def oheDatasetRoute(request: HttpRequest, dataset_id: int):
     raise BadRequest("invalid method")
 
 @csrf_exempt
+def YRoute(request: HttpRequest, dataset_id: int):
+    if (request.method == "POST"):
+        json_data = json.loads(request.body)
+        columns_Y = json_data['columns']
+        res = DatasetService.Y_dataset(dataset_id, columns_Y)
+        return JsonResponse(json.loads(res), safe=False)
+    raise BadRequest("invalid method")
+
+@csrf_exempt
 def normalizeDatasetRoute(request: HttpRequest, dataset_id: int):
     if (request.method == "POST"):
         res = DatasetService.normalize_columns(dataset_id)
@@ -83,8 +92,15 @@ def imputationDatasetRoute(request: HttpRequest, dataset_id: int):
     raise BadRequest("invalid method")
 
 @csrf_exempt
-def visualizeDatasetRoute(request: HttpRequest, dataset_id: int):
+def visualizeDatasetRoutePca(request: HttpRequest, dataset_id: int):
     if (request.method == "POST"):
-        res = DatasetService.visualize_Dataset(dataset_id)
+        res = DatasetService.visualize_Dataset_Pca(dataset_id)
+        return JsonResponse(res, safe=False)
+    raise BadRequest("invalid method")
+
+@csrf_exempt
+def visualizeDatasetRouteTsne(request: HttpRequest, dataset_id: int):
+    if (request.method == "POST"):
+        res = DatasetService.visualize_Dataset_Tsne(dataset_id)
         return JsonResponse(res, safe=False)
     raise BadRequest("invalid method")

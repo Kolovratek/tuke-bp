@@ -12,6 +12,12 @@ function Menu() {
         Uploader
       </NavLink>{' '}
       <NavLink
+        to={`/generate`}
+        className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}
+      >
+        Generate
+      </NavLink>{' '}
+      <NavLink
         to={`/datasets`}
         className={({ isActive, isPending }) => (isActive ? 'active' : isPending ? 'pending' : '')}
       >

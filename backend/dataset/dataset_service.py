@@ -3,6 +3,7 @@ from dataset.models import Dataset
 from dataset.helpers import parse_file_to_DataFrame
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 import pandas as pd
 import numpy as np
 import json
@@ -84,6 +85,22 @@ class DatasetService:
             return { "status": "error", "message": "Dataset not found" }
 
     @staticmethod
+    def Y_dataset(dataset_id: int, columns_Y):
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            df = pd.DataFrame(dataset.data)
+            df = df.drop(columns_Y, axis=1)
+            df[columns_Y] = dataset.data[columns_Y]
+            data = df.to_dict('records')
+            dataset.data = data
+            dataset.save()
+            res = df.to_json(orient='records')
+            return res
+        except Dataset.DoesNotExist:
+            return { "status": "error", "message": "Dataset not found" }
+    
+
+    @staticmethod
     def normalize_columns(dataset_id: int):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
@@ -133,7 +150,7 @@ class DatasetService:
             return { "status": "error", "message": "Dataset not found" }
 
     @staticmethod
-    def visualize_Dataset(dataset_id: int):
+    def visualize_Dataset_Tsne(dataset_id: int):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
@@ -144,6 +161,20 @@ class DatasetService:
             df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE_1', 't-SNE_2'])
             df_tsne[df.columns] = df[df.columns]
             res = json.loads(df_tsne.to_json(orient='records'))
+            return res
+        except Dataset.DoesNotExist:
+            return { "status": "error", "message": "Dataset not found" }
+            
+    @staticmethod
+    def visualize_Dataset_Pca(dataset_id: int):
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            df = pd.DataFrame(dataset.data)
+            pca = PCA(n_components=2)
+            X_pca = pca.fit_transform(df)
+            df_pca = pd.DataFrame(X_pca, columns=['t-SNE_1', 't-SNE_2'])
+            df_pca[df.columns] = df[df.columns]
+            res = json.loads(df_pca.to_json(orient='records'))
             return res
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }

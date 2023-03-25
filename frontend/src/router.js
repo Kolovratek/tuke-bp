@@ -6,6 +6,7 @@ import { Container } from 'reactstrap';
 import { Uploader } from './components/Uploader';
 import { Datasets } from './components/Datasets';
 import { Dataset } from './components/Dataset';
+import { Generate } from './components/Generate';
 
 export const router = createBrowserRouter([
   {
@@ -17,6 +18,14 @@ export const router = createBrowserRouter([
         element: (
           <Container>
             <Uploader />
+          </Container>
+        )
+      },
+      {
+        path: '/generate',
+        element: (
+          <Container>
+            <Generate />
           </Container>
         )
       },

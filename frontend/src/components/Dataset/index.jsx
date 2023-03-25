@@ -11,13 +11,13 @@ import './index.css';
 
 export function Dataset() {
   const { id } = useParams();
-  const [, setDropColumns] = useState([]);
-  const [, setOneHotColumns] = useState([]);
   const [dataset, setDataset] = useState(null);
   const [error, setError] = useState(false);
+
+  // Visualize graf
   const [visualize, setVisualize] = useState(false);
   const [visualization, setVisualization] = useState(null);
-  const [visualizeButton, setVisualizeButton] = useState(false);
+
   const [normalizeButton, setNormalizeButton] = useState(false);
   const [imputationZeroButton, setImputationZeroButton] = useState(false);
   const [imputationMedianButton, setImputationMedianButton] = useState(false);
@@ -26,6 +26,9 @@ export function Dataset() {
   const [dropIsExpanded, setDropIsExpanded] = useState(false);
   const [oneHotIsExpanded, setOneHotIsExpanded] = useState(false);
   const [downloadIsExpanded, setDownloadIsExpanded] = useState(false);
+  const [yIsExpanded, setYIsExpanded] = useState(false);
+  const [yIsClicked, setYIsClicked] = useState(false);
+  const [visualizeIsExpanded, setVisualizeIsExpanded] = useState(false);
 
   useEffect(() => {
     const request = async () => {
@@ -34,6 +37,14 @@ export function Dataset() {
     };
     request();
   }, []);
+
+  const toggleDropdownY = () => {
+    setYIsExpanded(!yIsExpanded);
+  };
+
+  const toggleDropdownVisualize = () => {
+    setVisualizeIsExpanded(!visualizeIsExpanded);
+  };
 
   const toggleDropdownDownload = () => {
     setDownloadIsExpanded(!downloadIsExpanded);
@@ -67,13 +78,16 @@ export function Dataset() {
   );
 
   const handleDrop = async (header) => {
-    setDropColumns([header]);
     await handleRequest(id, () => APIDatabase.drop(header, id));
   };
 
   const handleOneHotEncoding = async (header) => {
-    setOneHotColumns([header]);
     await handleRequest(id, () => APIDatabase.oneHotEncoding(header, id));
+  };
+
+  const handleY = async (header) => {
+    await handleRequest(id, () => APIDatabase.Y(header, id));
+    setYIsClicked(true);
   };
 
   const handleNormalize = async () => {
@@ -128,12 +142,21 @@ export function Dataset() {
     }
   };
 
-  const handleVisualize = async () => {
+  const handleVisualizeTsne = async () => {
     try {
-      const response = await APIDatabase.visualize(id);
+      const response = await APIDatabase.visualizeTsne(id);
       setVisualization(response);
       setVisualize(true);
-      setVisualizeButton(true);
+    } catch (error) {
+      setError(true);
+    }
+  };
+
+  const handleVisualizePca = async () => {
+    try {
+      const response = await APIDatabase.visualizePca(id);
+      setVisualization(response);
+      setVisualize(true);
     } catch (error) {
       setError(true);
     }
@@ -222,13 +245,42 @@ export function Dataset() {
                 </div>
               )}
             </div>
-
-            <Button
-              style={{ backgroundColor: visualizeButton ? 'green' : 'secondary' }}
-              onClick={handleVisualize}
-            >
-              Visualize
-            </Button>
+            {!yIsClicked && (
+              <div className="dropdown-container">
+                <button className="main-button" onClick={toggleDropdownY}>
+                  Y
+                </button>
+                {yIsExpanded && (
+                  <div className="dropdown">
+                    {Object.keys(dataset.data[0]).map((header, index) => (
+                      <button
+                        key={index}
+                        value={header}
+                        className="dropdown-button"
+                        onClick={() => handleY(header)}
+                      >
+                        {header}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="dropdown-container">
+              <button className="main-button" onClick={toggleDropdownVisualize}>
+                Visualize
+              </button>
+              {visualizeIsExpanded && (
+                <div className="dropdown">
+                  <button className="dropdown-button" onClick={handleVisualizePca}>
+                    PCA
+                  </button>
+                  <button className="dropdown-button" onClick={handleVisualizeTsne}>
+                    TSNE
+                  </button>
+                </div>
+              )}
+            </div>
             <Button
               style={{ backgroundColor: normalizeButton ? 'green' : 'secondary' }}
               onClick={handleNormalize}

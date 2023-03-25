@@ -42,6 +42,19 @@ export class APIDatabase {
     return body;
   }
 
+  static async Y(YColumns, id) {
+    const res = await fetch(`${URL}/dataset/Y/${id}`, {
+      method: 'POST',
+      headers: COMMON_HEADERS,
+      body: JSON.stringify({
+        columns: YColumns,
+        id
+      })
+    });
+    const body = await res.json();
+    return body;
+  }
+
   static async normalize(id) {
     try {
       const res = await fetch(`${URL}/dataset/normalize/${id}`, {
@@ -58,9 +71,25 @@ export class APIDatabase {
     }
   }
 
-  static async visualize(id) {
+  static async visualizeTsne(id) {
     try {
-      const res = await fetch(`${URL}/dataset/visualize_data/${id}`, {
+      const res = await fetch(`${URL}/dataset/visualize_data_tsne/${id}`, {
+        method: 'POST',
+        headers: COMMON_HEADERS,
+        body: JSON.stringify({
+          id
+        })
+      });
+      const body = await res.json();
+      return body;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  static async visualizePca(id) {
+    try {
+      const res = await fetch(`${URL}/dataset/visualize_data_pca/${id}`, {
         method: 'POST',
         headers: COMMON_HEADERS,
         body: JSON.stringify({
