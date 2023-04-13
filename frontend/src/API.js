@@ -71,6 +71,22 @@ export class APIDatabase {
     }
   }
 
+  static async split(id) {
+    try {
+      const res = await fetch(`${URL}/dataset/split/${id}`, {
+        method: 'POST',
+        headers: COMMON_HEADERS,
+        body: JSON.stringify({
+          id
+        })
+      });
+      const body = await res.json();
+      return body;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }
+
   static async visualizeTsne(id) {
     try {
       const res = await fetch(`${URL}/dataset/visualize_data_tsne/${id}`, {

@@ -83,6 +83,13 @@ def normalizeDatasetRoute(request: HttpRequest, dataset_id: int):
     raise BadRequest("invalid method")
 
 @csrf_exempt
+def splitDatasetRoute(request: HttpRequest, dataset_id: int):
+    if (request.method == "POST"):
+        res = DatasetService.split_data(dataset_id)
+        return JsonResponse(json.loads(res), safe=False)
+    raise BadRequest("invalid method")
+
+@csrf_exempt
 def imputationDatasetRoute(request: HttpRequest, dataset_id: int):
     if (request.method == "POST"):
         json_data = json.loads(request.body)

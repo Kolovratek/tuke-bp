@@ -1,12 +1,16 @@
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
+from django.db import transaction
 from dataset.models import Dataset
 from dataset.helpers import parse_file_to_DataFrame
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import json
+import random
+
 
 class DatasetService:
     @staticmethod
@@ -23,6 +27,7 @@ class DatasetService:
     def upload(file) -> Dataset:
         print("Received new data")
         df = parse_file_to_DataFrame(file)
+        df['XY'] = 'train'
         data = df.replace({np.nan: None}).to_dict('records')
         dataset = Dataset.objects.create(data=data)
         dataset.save()
@@ -40,14 +45,6 @@ class DatasetService:
     @staticmethod
     def drop_columns(dataset_id: int, columnsToRemove):
         try:
-            # dataset = Dataset.objects.get(id=dataset_id)
-            # df = pd.DataFrame(dataset.data)
-            # df = df.drop(columnsToRemove, axis=1)
-            # res = df.to_json(orient='records')
-            # data = df.to_dict('records')
-            # dataset.data = data
-            # dataset.save()
-            # return res
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
             df = df.fillna('')
@@ -69,13 +66,15 @@ class DatasetService:
             df = df.fillna('')
             columns_ohe = [df.columns.get_loc(columns_ohe)]
             encoder = OneHotEncoder(handle_unknown='ignore')
-            print(columns_ohe)
             columns_to_encode = [columns_ohe] if isinstance(columns_ohe, str) else columns_ohe
             encoder.fit(df.iloc[:, columns_to_encode])
             categories = encoder.categories_[0]
             encoder_df = pd.DataFrame(encoder.transform(df.iloc[:, columns_to_encode]).toarray(), columns=categories)
             df = df.drop(df.columns[columns_ohe], axis=1)
             final_df = pd.concat([df, encoder_df], axis=1)
+            if 'special_main' in final_df.columns:
+                special_main_col = final_df.pop('special_main')
+                final_df['special_main'] = special_main_col
             res = final_df.to_json(orient='records')
             data = final_df.to_dict('records')
             dataset.data = data
@@ -89,8 +88,8 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            df = df.drop(columns_Y, axis=1)
-            df[columns_Y] = dataset.data[columns_Y]
+            special_main_col = df.pop(columns_Y)
+            df["special_main"] = special_main_col
             data = df.to_dict('records')
             dataset.data = data
             dataset.save()
@@ -105,11 +104,6 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            # scaler = MinMaxScaler()
-            # df_normalized = pd.DataFrame(scaler.fit_transform(df), columns=df.columns)
-            # STARE
-            # column_name = df.columns[columns_normalize]
-            # df[column_name] = MinMaxScaler().fit_transform(np.array(df[column_name]).reshape(-1,1))
             scaler = MinMaxScaler()
             for col_name in df.columns:
                 if df[col_name].dtype == np.float64 or df[col_name].dtype == np.int64:
@@ -121,20 +115,29 @@ class DatasetService:
             return res
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
-        
     
+    @staticmethod
+    @transaction.atomic
+    def split_data(dataset_id: int):
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+            df = pd.DataFrame(dataset.data)
+            test_rows = df.sample(frac=0.2, random_state=None)
+            df.loc[test_rows.index, 'XY'] = 'test'
+            data = df.to_dict('records')
+            dataset.data = data
+            dataset.save()
+            res = df.to_json(orient='records')
+            return res
+        except Dataset.DoesNotExist:
+            return { "status": "error", "message": "Dataset not found" }
+
     @staticmethod
     def imputation_columns(dataset_id: int, type_of_imputation):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
             df = df.replace("", np.nan)
-            # if type_of_imputation == '0':
-            #     df[column_name] = df[column_name].fillna(0)
-            # elif type_of_imputation == 'mean':
-            #     df[column_name] = df[column_name].fillna(df[column_name].mean())
-            # elif type_of_imputation == 'median':
-            #     df[column_name] = df[column_name].fillna(df[column_name].median())
             if type_of_imputation == '0':
                 df = df.fillna(0)
             elif type_of_imputation == 'mean':
@@ -154,8 +157,6 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            # column_name = df.columns[columns_visualize].tolist()
-            # X = df.loc[:, column_name]
             tsne = TSNE(n_components=2, random_state=42, init='random', perplexity=2)
             X_tsne = tsne.fit_transform(df)
             df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE_1', 't-SNE_2'])

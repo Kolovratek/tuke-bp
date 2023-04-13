@@ -18,6 +18,7 @@ export function Dataset() {
   const [visualize, setVisualize] = useState(false);
   const [visualization, setVisualization] = useState(null);
 
+  const [splitButton, setSplitButton] = useState(false);
   const [normalizeButton, setNormalizeButton] = useState(false);
   const [imputationZeroButton, setImputationZeroButton] = useState(false);
   const [imputationMedianButton, setImputationMedianButton] = useState(false);
@@ -103,6 +104,19 @@ export function Dataset() {
     }
   };
 
+  const handleSplit = async () => {
+    try {
+      const data = await APIDatabase.split(id);
+      setDataset({
+        data,
+        id
+      });
+      setSplitButton(true);
+    } catch (error) {
+      setError(true);
+    }
+  };
+
   const handleImputationZero = async () => {
     try {
       const data = await APIDatabase.Imputation('0', id);
@@ -183,16 +197,21 @@ export function Dataset() {
               </button>
               {dropIsExpanded && (
                 <div className="dropdown">
-                  {Object.keys(dataset.data[0]).map((header, index) => (
-                    <button
-                      key={index}
-                      value={header}
-                      className="dropdown-button"
-                      onClick={() => handleDrop(header)}
-                    >
-                      {header}
-                    </button>
-                  ))}
+                  {Object.keys(dataset.data[0]).map((header, index) => {
+                    if (header !== 'XY' && header !== 'special_main') {
+                      return (
+                        <button
+                          key={index}
+                          value={header}
+                          className="dropdown-button"
+                          onClick={() => handleDrop(header)}
+                        >
+                          {header}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
               )}
             </div>
@@ -202,16 +221,21 @@ export function Dataset() {
               </button>
               {oneHotIsExpanded && (
                 <div className="dropdown">
-                  {Object.keys(dataset.data[0]).map((header, index) => (
-                    <button
-                      key={index}
-                      value={header}
-                      className="dropdown-button"
-                      onClick={() => handleOneHotEncoding(header)}
-                    >
-                      {header}
-                    </button>
-                  ))}
+                  {Object.keys(dataset.data[0]).map((header, index) => {
+                    if (header !== 'XY' && header !== 'special_main') {
+                      return (
+                        <button
+                          key={index}
+                          value={header}
+                          className="dropdown-button"
+                          onClick={() => handleOneHotEncoding(header)}
+                        >
+                          {header}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
               )}
             </div>
@@ -252,16 +276,21 @@ export function Dataset() {
                 </button>
                 {yIsExpanded && (
                   <div className="dropdown">
-                    {Object.keys(dataset.data[0]).map((header, index) => (
-                      <button
-                        key={index}
-                        value={header}
-                        className="dropdown-button"
-                        onClick={() => handleY(header)}
-                      >
-                        {header}
-                      </button>
-                    ))}
+                    {Object.keys(dataset.data[0]).map((header, index) => {
+                      if (header !== 'XY') {
+                        return (
+                          <button
+                            key={index}
+                            value={header}
+                            className="dropdown-button"
+                            onClick={() => handleY(header)}
+                          >
+                            {header}
+                          </button>
+                        );
+                      }
+                      return null;
+                    })}
                   </div>
                 )}
               </div>
@@ -286,6 +315,13 @@ export function Dataset() {
               onClick={handleNormalize}
             >
               Normalize
+            </Button>
+            <Button
+              style={{ backgroundColor: splitButton ? 'green' : 'secondary' }}
+              onClick={handleSplit}
+              disabled={splitButton}
+            >
+              Split data
             </Button>
             <div className="dropdown-container">
               <button className="main-button" onClick={toggleDropdownDownload}>
