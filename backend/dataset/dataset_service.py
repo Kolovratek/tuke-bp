@@ -107,10 +107,10 @@ class DatasetService:
             for col_name in df.columns:
                 if df[col_name].dtype == np.float64 or df[col_name].dtype == np.int64:
                     df[col_name] = scaler.fit_transform(np.array(df[col_name]).reshape(-1, 1))
-            res = df.to_json(orient='records')
             data = df.to_dict('records')
             dataset.data = data
             dataset.save()
+            res = df.to_json(orient='records')
             return res
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }

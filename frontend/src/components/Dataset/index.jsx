@@ -18,8 +18,15 @@ export function Dataset() {
   const [visualize, setVisualize] = useState(false);
   const [visualization, setVisualization] = useState(null);
 
-  const [splitButton, setSplitButton] = useState(false);
-  const [normalizeButton, setNormalizeButton] = useState(false);
+  const [splitButton, setSplitButton] = useState(() => {
+    const savedSplitButton = localStorage.getItem(`splitButton-${id}`);
+    return savedSplitButton !== null ? JSON.parse(savedSplitButton) : false;
+  });
+
+  const [normalizeButton, setNormalizeButton] = useState(() => {
+    const savedNormalizeButton = localStorage.getItem(`normalizeButton-${id}`);
+    return savedNormalizeButton !== null ? JSON.parse(savedNormalizeButton) : false;
+  });
   const [imputationZeroButton, setImputationZeroButton] = useState(false);
   const [imputationMedianButton, setImputationMedianButton] = useState(false);
   const [imputationMeanButton, setImputationMeanButton] = useState(false);
@@ -38,6 +45,14 @@ export function Dataset() {
     };
     request();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem(`normalizeButton-${id}`, JSON.stringify(normalizeButton));
+  }, [normalizeButton, id]);
+
+  useEffect(() => {
+    localStorage.setItem(`splitButton-${id}`, JSON.stringify(splitButton));
+  }, [splitButton, id]);
 
   const toggleDropdownY = () => {
     setYIsExpanded(!yIsExpanded);
