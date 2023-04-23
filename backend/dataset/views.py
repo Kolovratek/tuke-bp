@@ -9,13 +9,13 @@ def handleDatasetRoot(request: HttpRequest):
     if (request.method == "GET"):
         datasets = DatasetService.get_all()
         return JsonResponse({
-            "datasets_ids": list(map(lambda x: x.id, datasets))
+            "datasets": list(datasets)
         })
 
     if (request.method == "POST"):
-        #filename = request.body['filename']
         file = request.FILES['file']
-        dataset = DatasetService.upload(file)
+        filename = request.FILES['file'].name
+        dataset = DatasetService.upload(file, filename)
         
         return JsonResponse({ "id": dataset.id })
 

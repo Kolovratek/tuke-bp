@@ -311,12 +311,14 @@ export function Dataset() {
               )}
             </div>
             <Button
+              className="main-button"
               style={{ backgroundColor: normalizeButton ? 'green' : 'secondary' }}
               onClick={handleNormalize}
             >
               Normalize
             </Button>
             <Button
+              className="main-button"
               style={{ backgroundColor: splitButton ? 'green' : 'secondary' }}
               onClick={handleSplit}
               disabled={splitButton}

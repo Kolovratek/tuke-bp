@@ -15,8 +15,8 @@ import random
 class DatasetService:
     @staticmethod
     def get_all():
-        datasets = Dataset.objects.all()
-        return datasets
+        datasets = Dataset.objects.all().values('id', 'filename')
+        return list(datasets)
 
     @staticmethod
     def get(dataset_id: int) -> Dataset:
@@ -24,12 +24,11 @@ class DatasetService:
         return dataset
 
     @staticmethod
-    def upload(file) -> Dataset:
-        print("Received new data")
+    def upload(file, filename) -> Dataset:
         df = parse_file_to_DataFrame(file)
         df['XY'] = 'train'
         data = df.replace({np.nan: None}).to_dict('records')
-        dataset = Dataset.objects.create(data=data)
+        dataset = Dataset.objects.create(data=data, filename=filename)
         dataset.save()
         return dataset
 
@@ -157,12 +156,23 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
+            df_without_xy = df.drop(['XY'], axis=1)
             tsne = TSNE(n_components=2, random_state=42, init='random', perplexity=2)
-            X_tsne = tsne.fit_transform(df)
+            X_tsne = tsne.fit_transform(df_without_xy)
             df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE_1', 't-SNE_2'])
-            df_tsne[df.columns] = df[df.columns]
+            df_tsne[df_without_xy.columns] = df_without_xy
             res = json.loads(df_tsne.to_json(orient='records'))
             return res
+        # try:
+        #     dataset = Dataset.objects.get(id=dataset_id)
+        #     df = pd.DataFrame(dataset.data)
+        #     df_without_xy = df.drop(['XY'], axis=1)
+        #     tsne = TSNE(n_components=1, random_state=42, init='random', perplexity=2)
+        #     X_tsne = tsne.fit_transform(df_without_xy)
+        #     df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE'])
+        #     df_tsne['special_main'] = df['special_main']
+        #     res = json.loads(df_tsne.to_json(orient='records'))
+        #     return res
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
             
@@ -171,10 +181,11 @@ class DatasetService:
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
+            df_without_xy = df.drop(['XY'], axis=1)
             pca = PCA(n_components=2)
-            X_pca = pca.fit_transform(df)
+            X_pca = pca.fit_transform(df_without_xy)
             df_pca = pd.DataFrame(X_pca, columns=['t-SNE_1', 't-SNE_2'])
-            df_pca[df.columns] = df[df.columns]
+            df_pca[df_without_xy.columns] = df_without_xy
             res = json.loads(df_pca.to_json(orient='records'))
             return res
         except Dataset.DoesNotExist:

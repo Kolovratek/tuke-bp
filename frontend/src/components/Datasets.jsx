@@ -9,7 +9,7 @@ export function Datasets() {
   useEffect(() => {
     const request = async () => {
       const res = await APIDatabase.getAll();
-      setDatasets(res.datasets_ids);
+      setDatasets(res.datasets);
     };
     request();
   }, []);
@@ -17,7 +17,7 @@ export function Datasets() {
   const handleDeleteDataset = async (datasetId) => {
     const res = await APIDatabase.delete_dataset(datasetId);
     if (res.status === 'success') {
-      setDatasets(datasets.filter((id) => id !== datasetId));
+      setDatasets(datasets.filter((dataset) => dataset.id !== datasetId));
     }
   };
 
@@ -25,14 +25,14 @@ export function Datasets() {
     <div>
       <Table>Datasets</Table>
       <tbody>
-        {datasets.map((datasetId) => (
-          <tr key={datasetId}>
-            <td>{datasetId}</td>
+        {datasets.map((dataset) => (
+          <tr key={dataset.id}>
+            <td>{dataset.id}</td>
             <td>
-              <input type="checkbox" onClick={() => handleDeleteDataset(datasetId)} />
+              <input type="checkbox" onClick={() => handleDeleteDataset(dataset.id)} />
             </td>
             <td>
-              <Link to={`/dataset/${datasetId}`}>Dataset Name</Link>
+              <Link to={`/dataset/${dataset.id}`}>{dataset.filename}</Link>
             </td>
           </tr>
         ))}
