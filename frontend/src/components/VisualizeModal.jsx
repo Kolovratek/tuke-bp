@@ -15,9 +15,9 @@ export const VisualizeModal = (props) => {
               y: props.visualization.map((row) => row['t-SNE_2']),
               mode: 'markers',
               marker: {
-                color: props.visualization.map((row) => row.special_main),
+                color: props.visualization.map((row) => row[props.title]),
                 colorscale: 'Viridis',
-                colorbar: { title: 'Special Main' }
+                colorbar: { title: props.title }
               }
             }
           ]}
@@ -31,19 +31,6 @@ export const VisualizeModal = (props) => {
             yaxis: { title: 'Názov osi Y', showticklabels: false }
           }}
         />
-        {/* <Plot
-          data={[
-            {
-              x: props.visualization.map((row) => row['t-SNE']),
-              y: props.visualization.map((row) => row.special_main),
-              mode: 'markers',
-              marker: {
-                color: props.visualization.map((row) => row.id),
-                colorscale: 'Viridis'
-              }
-            }
-          ]}
-        /> */}
         <ModalFooter>
           <Button variant="secondary" onClick={props.onConfirm}>
             Close
@@ -56,5 +43,6 @@ export const VisualizeModal = (props) => {
 
 VisualizeModal.propTypes = {
   visualization: PropTypes.array.isRequired,
+  title: PropTypes.array.isRequired,
   onConfirm: PropTypes.func.isRequired
 };

@@ -13,16 +13,13 @@ export function Dataset() {
   const { id } = useParams();
   const [dataset, setDataset] = useState(null);
   const [error, setError] = useState(false);
-
-  // Visualize graf
   const [visualize, setVisualize] = useState(false);
   const [visualization, setVisualization] = useState(null);
-
+  const [title, setTitle] = useState(null);
   const [splitButton, setSplitButton] = useState(() => {
     const savedSplitButton = localStorage.getItem(`splitButton-${id}`);
     return savedSplitButton !== null ? JSON.parse(savedSplitButton) : false;
   });
-
   const [normalizeButton, setNormalizeButton] = useState(() => {
     const savedNormalizeButton = localStorage.getItem(`normalizeButton-${id}`);
     return savedNormalizeButton !== null ? JSON.parse(savedNormalizeButton) : false;
@@ -35,7 +32,6 @@ export function Dataset() {
   const [oneHotIsExpanded, setOneHotIsExpanded] = useState(false);
   const [downloadIsExpanded, setDownloadIsExpanded] = useState(false);
   const [yIsExpanded, setYIsExpanded] = useState(false);
-  const [yIsClicked, setYIsClicked] = useState(false);
   const [visualizeIsExpanded, setVisualizeIsExpanded] = useState(false);
 
   useEffect(() => {
@@ -101,74 +97,34 @@ export function Dataset() {
     await handleRequest(id, () => APIDatabase.oneHotEncoding(header, id));
   };
 
-  const handleY = async (header) => {
-    await handleRequest(id, () => APIDatabase.Y(header, id));
-    setYIsClicked(true);
+  const handleLabel = async (header) => {
+    await handleRequest(id, () => APIDatabase.label(header, id));
+    setTitle(header);
   };
 
   const handleNormalize = async () => {
-    try {
-      const data = await APIDatabase.normalize(id);
-      setDataset({
-        data,
-        id
-      });
-      setNormalizeButton(true);
-    } catch (error) {
-      setError(true);
-    }
+    await handleRequest(id, () => APIDatabase.normalize(id));
+    setNormalizeButton(true);
   };
 
   const handleSplit = async () => {
-    try {
-      const data = await APIDatabase.split(id);
-      setDataset({
-        data,
-        id
-      });
-      setSplitButton(true);
-    } catch (error) {
-      setError(true);
-    }
+    await handleRequest(id, () => APIDatabase.split(id));
+    setSplitButton(true);
   };
 
   const handleImputationZero = async () => {
-    try {
-      const data = await APIDatabase.Imputation('0', id);
-      setDataset({
-        data,
-        id
-      });
-      setImputationZeroButton(true);
-    } catch (error) {
-      setError(true);
-    }
+    await handleRequest(id, () => APIDatabase.Imputation('0', id));
+    setImputationZeroButton(true);
   };
 
   const handleImputationMean = async () => {
-    try {
-      const data = await APIDatabase.Imputation('mean', id);
-      setDataset({
-        data,
-        id
-      });
-      setImputationMeanButton(true);
-    } catch (error) {
-      setError(true);
-    }
+    await handleRequest(id, () => APIDatabase.Imputation('mean', id));
+    setImputationMeanButton(true);
   };
 
   const handleImputationMedian = async () => {
-    try {
-      const data = await APIDatabase.Imputation('median', id);
-      setDataset({
-        data,
-        id
-      });
-      setImputationMedianButton(true);
-    } catch (error) {
-      setError(true);
-    }
+    await handleRequest(id, () => APIDatabase.Imputation('median', id));
+    setImputationMedianButton(true);
   };
 
   const handleVisualizeTsne = async () => {
@@ -202,7 +158,9 @@ export function Dataset() {
     <div>
       <h1>Dataset ID {id}</h1>
       {error && <ErrorModal onConfirm={handleClose} />}
-      {visualize && <VisualizeModal onConfirm={handleClose} visualization={visualization} />}
+      {visualize && (
+        <VisualizeModal onConfirm={handleClose} visualization={visualization} title={title} />
+      )}
       {dataset && (
         <div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
@@ -284,32 +242,30 @@ export function Dataset() {
                 </div>
               )}
             </div>
-            {!yIsClicked && (
-              <div className="dropdown-container">
-                <button className="main-button" onClick={toggleDropdownY}>
-                  Y
-                </button>
-                {yIsExpanded && (
-                  <div className="dropdown">
-                    {Object.keys(dataset.data[0]).map((header, index) => {
-                      if (header !== 'XY') {
-                        return (
-                          <button
-                            key={index}
-                            value={header}
-                            className="dropdown-button"
-                            onClick={() => handleY(header)}
-                          >
-                            {header}
-                          </button>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="dropdown-container">
+              <button className="main-button" onClick={toggleDropdownY}>
+                Label
+              </button>
+              {yIsExpanded && (
+                <div className="dropdown">
+                  {Object.keys(dataset.data[0]).map((header, index) => {
+                    if (header !== 'XY') {
+                      return (
+                        <button
+                          key={index}
+                          value={header}
+                          className="dropdown-button"
+                          onClick={() => handleLabel(header)}
+                        >
+                          {header}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              )}
+            </div>
             <div className="dropdown-container">
               <button className="main-button" onClick={toggleDropdownVisualize}>
                 Visualize
@@ -329,6 +285,7 @@ export function Dataset() {
               className="main-button"
               style={{ backgroundColor: normalizeButton ? 'green' : 'secondary' }}
               onClick={handleNormalize}
+              disabled={normalizeButton}
             >
               Normalize
             </Button>

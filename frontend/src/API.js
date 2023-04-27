@@ -42,12 +42,12 @@ export class APIDatabase {
     return body;
   }
 
-  static async Y(YColumns, id) {
-    const res = await fetch(`${URL}/dataset/Y/${id}`, {
+  static async label(labelColumns, id) {
+    const res = await fetch(`${URL}/dataset/label/${id}`, {
       method: 'POST',
       headers: COMMON_HEADERS,
       body: JSON.stringify({
-        columns: YColumns,
+        columns: labelColumns,
         id
       })
     });

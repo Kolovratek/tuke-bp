@@ -18,16 +18,6 @@ export function MyTable({ data }) {
     </th>
   ));
 
-  // const rowsArray = Object.values(rows);
-  // const rowsArray2 = rows.map((row) => Object.values(row));
-  // const rowsRender = rowsArray2.map((row, index) => (
-  //   <tr key={index}>
-  //     {row.map((value, index) => (
-  //       <td key={index}>{value}</td>
-  //     ))}
-  //   </tr>
-  // ));
-
   const trainRows = rows.filter((row) => row.XY === 'train');
   const trainRowsArray = trainRows.map((row) => {
     const { XY, ...rest } = row;
@@ -35,9 +25,15 @@ export function MyTable({ data }) {
   });
   const trainRowsRender = trainRowsArray.map((row, index) => (
     <tr key={index}>
-      {row.map((value, index) => (
-        <td key={index}>{value}</td>
-      ))}
+      {row.map((value, index) => {
+        return value !== null ? (
+          <td key={index}>{value}</td>
+        ) : (
+          <td key={index} style={{ color: 'red' }}>
+            NaN
+          </td>
+        );
+      })}
     </tr>
   ));
 
@@ -48,9 +44,15 @@ export function MyTable({ data }) {
   });
   const testRowsRender = testRowsArray.map((row, index) => (
     <tr key={index}>
-      {row.map((value, index) => (
-        <td key={index}>{value}</td>
-      ))}
+      {row.map((value, index) => {
+        return value !== null ? (
+          <td key={index}>{value}</td>
+        ) : (
+          <td key={index} style={{ color: 'red' }}>
+            NaN
+          </td>
+        );
+      })}
     </tr>
   ));
 

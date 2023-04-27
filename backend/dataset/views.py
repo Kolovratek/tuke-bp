@@ -67,11 +67,11 @@ def oheDatasetRoute(request: HttpRequest, dataset_id: int):
     raise BadRequest("invalid method")
 
 @csrf_exempt
-def YRoute(request: HttpRequest, dataset_id: int):
+def labelRoute(request: HttpRequest, dataset_id: int):
     if (request.method == "POST"):
         json_data = json.loads(request.body)
-        columns_Y = json_data['columns']
-        res = DatasetService.Y_dataset(dataset_id, columns_Y)
+        columns_label = json_data['columns']
+        res = DatasetService.label_dataset(dataset_id, columns_label)
         return JsonResponse(json.loads(res), safe=False)
     raise BadRequest("invalid method")
 

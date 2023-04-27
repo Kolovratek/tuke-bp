@@ -83,12 +83,12 @@ class DatasetService:
             return { "status": "error", "message": "Dataset not found" }
 
     @staticmethod
-    def Y_dataset(dataset_id: int, columns_Y):
+    def label_dataset(dataset_id: int, columns_label):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            special_main_col = df.pop(columns_Y)
-            df["special_main"] = special_main_col
+            special_main_col = df.pop(columns_label)
+            df[columns_label] = special_main_col
             data = df.to_dict('records')
             dataset.data = data
             dataset.save()
@@ -97,7 +97,6 @@ class DatasetService:
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
     
-
     @staticmethod
     def normalize_columns(dataset_id: int):
         try:
@@ -123,7 +122,7 @@ class DatasetService:
             df = pd.DataFrame(dataset.data)
             test_rows = df.sample(frac=0.2, random_state=None)
             df.loc[test_rows.index, 'XY'] = 'test'
-            data = df.to_dict('records')
+            data = df.replace({np.nan: None}).to_dict('records')
             dataset.data = data
             dataset.save()
             res = df.to_json(orient='records')
@@ -140,9 +139,13 @@ class DatasetService:
             if type_of_imputation == '0':
                 df = df.fillna(0)
             elif type_of_imputation == 'mean':
-                df = df.fillna(df.mean(numeric_only=True))
+                train_df = df[df['XY'] == 'train']
+                train_mean = train_df.select_dtypes(include=np.number).mean()
+                df = df.fillna(train_mean)
             elif type_of_imputation == 'median':
-                df = df.fillna(df.median(numeric_only=True))
+                train_df = df[df['XY'] == 'train']
+                train_median = train_df.select_dtypes(include=np.number).median()
+                df = df.fillna(train_median)
             res = df.to_json(orient='records')
             data = df.to_dict('records')
             dataset.data = data
@@ -163,16 +166,6 @@ class DatasetService:
             df_tsne[df_without_xy.columns] = df_without_xy
             res = json.loads(df_tsne.to_json(orient='records'))
             return res
-        # try:
-        #     dataset = Dataset.objects.get(id=dataset_id)
-        #     df = pd.DataFrame(dataset.data)
-        #     df_without_xy = df.drop(['XY'], axis=1)
-        #     tsne = TSNE(n_components=1, random_state=42, init='random', perplexity=2)
-        #     X_tsne = tsne.fit_transform(df_without_xy)
-        #     df_tsne = pd.DataFrame(X_tsne, columns=['t-SNE'])
-        #     df_tsne['special_main'] = df['special_main']
-        #     res = json.loads(df_tsne.to_json(orient='records'))
-        #     return res
         except Dataset.DoesNotExist:
             return { "status": "error", "message": "Dataset not found" }
             
