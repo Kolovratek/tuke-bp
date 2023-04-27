@@ -22,6 +22,23 @@ def handleDatasetRoot(request: HttpRequest):
     raise BadRequest("invalid method")
 
 @csrf_exempt
+def generateDataset(request: HttpRequest):
+    if (request.method == "POST"):
+        json_data = json.loads(request.body)
+        fileName = json_data['fileName']
+        n_samples = json_data['samples']
+        n_features = json_data['features']
+        n_informative = json_data['informative']
+        n_redundant = json_data['redundant']
+        n_repeated = json_data['repeated']
+        n_classes = json_data['classes']
+        n_clustersPerClass = json_data['clustersPerClass']
+        dataset = DatasetService.generate_dataset(fileName,n_samples,n_features,n_informative,n_redundant,n_repeated,n_classes,n_clustersPerClass)
+        return JsonResponse({ "id": dataset.id })
+
+    raise BadRequest("invalid method")
+
+@csrf_exempt
 def handleDatasetWithId(request: HttpRequest, dataset_id: int):
     if (request.method == "GET"):
         dataset = DatasetService.get(dataset_id)
@@ -85,7 +102,10 @@ def normalizeDatasetRoute(request: HttpRequest, dataset_id: int):
 @csrf_exempt
 def splitDatasetRoute(request: HttpRequest, dataset_id: int):
     if (request.method == "POST"):
-        res = DatasetService.split_data(dataset_id)
+        json_data = json.loads(request.body)
+        input_value = json_data['value']
+        input_value = int(input_value)
+        res = DatasetService.split_data(dataset_id, input_value)
         return JsonResponse(json.loads(res), safe=False)
     raise BadRequest("invalid method")
 

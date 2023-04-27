@@ -6,6 +6,7 @@ from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
+from sklearn.datasets import make_classification
 import pandas as pd
 import numpy as np
 import json
@@ -31,6 +32,19 @@ class DatasetService:
         dataset = Dataset.objects.create(data=data, filename=filename)
         dataset.save()
         return dataset
+
+    @staticmethod
+    def generate_dataset(fileName, n_samples, n_features, n_informative, n_redundant, n_repeated, n_classes, n_clustersPerClass) -> Dataset:
+        X, y = make_classification(n_samples=n_samples, n_features=n_features, n_informative=n_informative, n_redundant=n_redundant, n_repeated=n_repeated, n_classes=n_classes, n_clusters_per_class=n_clustersPerClass)
+        feature_columns = [f'feature_{i+1}' for i in range(n_features)]
+        df = pd.DataFrame(X, columns=feature_columns)
+        df['target'] = y
+        df['XY'] = 'train'
+        data = df.to_dict(orient='records')
+        dataset = Dataset.objects.create(data=data, filename=fileName)
+        dataset.save()
+        return dataset
+
 
     @staticmethod
     def delete_dataset(dataset_id: int):
@@ -116,11 +130,12 @@ class DatasetService:
     
     @staticmethod
     @transaction.atomic
-    def split_data(dataset_id: int):
+    def split_data(dataset_id: int, input_value: int):
         try:
             dataset = Dataset.objects.get(id=dataset_id)
             df = pd.DataFrame(dataset.data)
-            test_rows = df.sample(frac=0.2, random_state=None)
+            value = input_value/100
+            test_rows = df.sample(frac=value, random_state=None)
             df.loc[test_rows.index, 'XY'] = 'test'
             data = df.replace({np.nan: None}).to_dict('records')
             dataset.data = data

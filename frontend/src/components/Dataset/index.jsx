@@ -33,6 +33,15 @@ export function Dataset() {
   const [downloadIsExpanded, setDownloadIsExpanded] = useState(false);
   const [yIsExpanded, setYIsExpanded] = useState(false);
   const [visualizeIsExpanded, setVisualizeIsExpanded] = useState(false);
+  const [splitDataIsExpanded, setSplitDataIsExpanded] = useState(false);
+  const [inputValue, setInputValue] = useState(() => {
+    const savedInputValue = localStorage.getItem(`inputValue-${id}`);
+    return savedInputValue !== null ? JSON.parse(savedInputValue) : '';
+  });
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
 
   useEffect(() => {
     const request = async () => {
@@ -50,12 +59,20 @@ export function Dataset() {
     localStorage.setItem(`splitButton-${id}`, JSON.stringify(splitButton));
   }, [splitButton, id]);
 
+  useEffect(() => {
+    localStorage.setItem(`inputValue-${id}`, JSON.stringify(inputValue));
+  }, [inputValue, id]);
+
   const toggleDropdownY = () => {
     setYIsExpanded(!yIsExpanded);
   };
 
   const toggleDropdownVisualize = () => {
     setVisualizeIsExpanded(!visualizeIsExpanded);
+  };
+
+  const toggleDropdownSplitData = () => {
+    setSplitDataIsExpanded(!splitDataIsExpanded);
   };
 
   const toggleDropdownDownload = () => {
@@ -107,8 +124,8 @@ export function Dataset() {
     setNormalizeButton(true);
   };
 
-  const handleSplit = async () => {
-    await handleRequest(id, () => APIDatabase.split(id));
+  const handleSplitData = async () => {
+    await handleRequest(id, () => APIDatabase.split(inputValue, id));
     setSplitButton(true);
   };
 
@@ -289,14 +306,39 @@ export function Dataset() {
             >
               Normalize
             </Button>
-            <Button
-              className="main-button"
-              style={{ backgroundColor: splitButton ? 'green' : 'secondary' }}
-              onClick={handleSplit}
-              disabled={splitButton}
-            >
-              Split data
-            </Button>
+            <div className="dropdown-container">
+              <button className="main-button" onClick={toggleDropdownSplitData}>
+                Split_Data
+              </button>
+              {splitDataIsExpanded && (
+                <div className="dropdown">
+                  <button className="dropdown-button">
+                    <input
+                      value={inputValue}
+                      style={{
+                        textAlign: 'center'
+                      }}
+                      onChange={handleInputChange}
+                      disabled={splitButton}
+                    ></input>
+                  </button>
+                  <Button
+                    className="dropdown-button"
+                    onClick={() => {
+                      handleSplitData();
+                      toggleDropdownSplitData();
+                    }}
+                    disabled={splitButton}
+                    style={{
+                      textAlign: 'center',
+                      backgroundColor: splitButton ? 'green' : 'secondary'
+                    }}
+                  >
+                    Ok
+                  </Button>
+                </div>
+              )}
+            </div>
             <div className="dropdown-container">
               <button className="main-button" onClick={toggleDropdownDownload}>
                 Select download method

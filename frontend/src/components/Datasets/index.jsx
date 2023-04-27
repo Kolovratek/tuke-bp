@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { APIDatabase } from '../API';
+import { APIDatabase } from '../../API';
+
+import './Datasets.css';
 
 export function Datasets() {
   const [datasets, setDatasets] = useState([]);
@@ -23,7 +24,6 @@ export function Datasets() {
 
   return (
     <div>
-      <Table>Datasets</Table>
       <tbody>
         {datasets.map((dataset) => (
           <tr key={dataset.id}>

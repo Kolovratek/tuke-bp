@@ -71,12 +71,13 @@ export class APIDatabase {
     }
   }
 
-  static async split(id) {
+  static async split(inputValue, id) {
     try {
       const res = await fetch(`${URL}/dataset/split/${id}`, {
         method: 'POST',
         headers: COMMON_HEADERS,
         body: JSON.stringify({
+          value: inputValue,
           id
         })
       });

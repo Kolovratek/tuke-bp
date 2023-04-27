@@ -1,6 +1,8 @@
 import React from 'react';
 import { Form, FormGroup, Label, Input, Card, Button, Row, Col } from 'reactstrap';
 
+import '../Uploader/Uploader.css';
+
 export function Uploader() {
   const [file, setFile] = React.useState(null);
   const [fileName, setFileName] = React.useState('');
@@ -32,9 +34,9 @@ export function Uploader() {
   };
 
   return (
-    <Row>
+    <Row className="upload-form">
       <Col sm="12" md={{ offset: 3, size: 6 }}>
-        <Card className="mt-3">
+        <Card style={{ backgroundColor: '#455d7a', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}>
           <Form className="p-3">
             <FormGroup>
               <Label htmlFor="file-upload">File upload</Label>
@@ -49,7 +51,7 @@ export function Uploader() {
               />
               {error && <p className="text-danger">{error}</p>}
             </FormGroup>
-            <Button block color="primary" onClick={onSubmit}>
+            <Button block style={{ backgroundColor: '#f95959', margin: 0 }} onClick={onSubmit}>
               Submit
             </Button>
           </Form>

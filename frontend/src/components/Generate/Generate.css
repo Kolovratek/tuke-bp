@@ -1,0 +1,22 @@
+Button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+Form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+Label,
+Input {
+  text-align: center;
+}
+
+Label {
+  font-size: 16px;
+  font-weight: bold;
+}
