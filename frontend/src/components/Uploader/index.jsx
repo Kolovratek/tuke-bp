@@ -39,7 +39,9 @@ export function Uploader() {
         <Card style={{ backgroundColor: '#455d7a', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}>
           <Form className="p-3">
             <FormGroup>
-              <Label htmlFor="file-upload">File upload</Label>
+              <Label htmlFor="file-upload" style={{ color: '#FFF' }}>
+                File upload
+              </Label>
               <Input
                 type="file"
                 id="file-upload"

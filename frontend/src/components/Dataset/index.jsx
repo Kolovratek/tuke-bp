@@ -300,7 +300,10 @@ export function Dataset() {
             </div>
             <Button
               className="main-button"
-              style={{ backgroundColor: normalizeButton ? 'green' : 'secondary' }}
+              style={{
+                backgroundColor: normalizeButton ? 'green' : 'secondary',
+                fontWeight: 'bold'
+              }}
               onClick={handleNormalize}
               disabled={normalizeButton}
             >
